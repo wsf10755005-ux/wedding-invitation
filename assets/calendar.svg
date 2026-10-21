@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="570" viewBox="0 0 600 570" role="img" aria-labelledby="title desc">
+<title id="title">2026年11月月曆，21日星期六為婚禮日</title><desc id="desc">以紅色圓圈標註11月21日，Save the date。</desc>
+<rect width="600" height="570" fill="#f1f1e9"/>
+<g fill="#33382f" text-anchor="middle" font-family="Georgia,serif">
+<text x="300" y="56" font-size="13" letter-spacing="5">SAVE THE DATE</text>
+<text x="300" y="111" font-size="42">November <tspan font-size="24" font-style="italic">2026</tspan></text>
+<path d="M48 139H552" stroke="#bfc6b1" stroke-width="1"/>
+<g font-size="12" letter-spacing="2" fill="#737c65"><text x="66" y="177">SUN</text><text x="144" y="177">MON</text><text x="222" y="177">TUE</text><text x="300" y="177">WED</text><text x="378" y="177">THU</text><text x="456" y="177">FRI</text><text x="534" y="177">SAT</text></g>
+<g font-size="23">
+<text x="66" y="231">1</text><text x="144" y="231">2</text><text x="222" y="231">3</text><text x="300" y="231">4</text><text x="378" y="231">5</text><text x="456" y="231">6</text><text x="534" y="231">7</text>
+<text x="66" y="289">8</text><text x="144" y="289">9</text><text x="222" y="289">10</text><text x="300" y="289">11</text><text x="378" y="289">12</text><text x="456" y="289">13</text><text x="534" y="289">14</text>
+<text x="66" y="347">15</text><text x="144" y="347">16</text><text x="222" y="347">17</text><text x="300" y="347">18</text><text x="378" y="347">19</text><text x="456" y="347">20</text><text x="534" y="347" fill="#a62830">21</text>
+<text x="66" y="405">22</text><text x="144" y="405">23</text><text x="222" y="405">24</text><text x="300" y="405">25</text><text x="378" y="405">26</text><text x="456" y="405">27</text><text x="534" y="405">28</text>
+<text x="66" y="463">29</text><text x="144" y="463">30</text>
+</g>
+<path d="M548 311C521 301 500 319 506 341C511 365 548 369 560 346C570 327 550 309 529 311" fill="none" stroke="#a62830" stroke-width="2.5" stroke-linecap="round"/>
+<path d="M48 489H552" stroke="#bfc6b1" stroke-width="1"/>
+<text x="300" y="533" font-size="21" font-style="italic" fill="#a62830">11.21 — Our forever begins.</text>
+</g></svg>
