@@ -81,13 +81,22 @@ function sendRSVP(data, timeoutMs = 45000) {
   try{outgoing.submit();}catch(error){cleanup();reject(error);}
  });
 }
+// 現有接收程式儲存 message；以固定首行攜帶關係，名單再拆成獨立欄。
+function encodeRelationship(data) {
+ const relationship=String(data.relationship||'').trim().replace(/[\r\n]+/g,' ');
+ if(!relationship||relationship.length>60)throw new Error('請填寫與新人的關係（60 字以內）。');
+ const message=String(data.message||'').trim();
+ if(message.length>1900)throw new Error('祝福留言請保持在 1900 字以內。');
+ return {...data,relationship,message:'【與新人關係】'+relationship+'\n'+message};
+}
 let pendingReply=null;
 form.addEventListener('submit',async e=>{
  e.preventDefault();
  const status=document.getElementById('form-status');
  if(location.origin!=='https://wsf10755005-ux.github.io'){status.textContent='請開啟線上請帖，再送出出席回覆。';return;}
  if(form.dataset.sending)return;
- const data=Object.fromEntries(new FormData(form));
+ let data=Object.fromEntries(new FormData(form));
+ try{data=encodeRelationship(data);}catch(error){status.textContent=error.message;return;}
  if(Number(data.vegetarian||0)>Number(data.guests||0)){form.elements.vegetarian.setCustomValidity('素食人數不可超過午宴總人數');form.elements.vegetarian.reportValidity();return;}
  // 強制以文字儲存電話，保留開頭的 0 與國碼。
  data.phone="'"+String(data.phone||'').trim();
