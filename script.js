@@ -1,5 +1,6 @@
 // 修改這裡即可調整新人姓名、日期及照片。日期請保留時區。
 const CONFIG = {
+  rsvpEndpoint: 'https://script.google.com/macros/s/AKfycbycVoREn-rE1ZPHy9FdTjRZg42ICfbmU_M0eK__3tlzrmrNf4xIfaA5k804BKV1RT0N/exec',
   groom: '李典諭', bride: '王少妤',
   date: '2026-11-21T10:00:00+08:00', dateLabel: '2026.11.21',
   music: '', // 提供音檔後填入本機相對路徑，例如 assets/music.mp3。
@@ -59,5 +60,46 @@ const form=document.getElementById('rsvp-form');
 const conditions=[['ceremony','ceremony-count','ceremonyCount'],['reception','reception-count','guests'],['invitation','address-field','address']];
 function syncFields(){conditions.forEach(([name,id,requiredName])=>{const active=form.elements[name].value==='是';document.getElementById(id).hidden=!active;document.getElementById(id).querySelectorAll('input').forEach(input=>{input.disabled=!active;input.required=active&&input.name===requiredName;});});}
 form.addEventListener('change',syncFields);syncFields();
-form.addEventListener('submit',e=>{e.preventDefault();const data=Object.fromEntries(new FormData(form));if(Number(data.vegetarian||0)>Number(data.guests||0)){form.elements.vegetarian.setCustomValidity('素食人數不可超過午宴總人數');form.elements.vegetarian.reportValidity();return;}const text=['婚禮出席回覆',`姓名：${data.name}`,`聯絡電話：${data.phone}`,`典禮出席：${data.ceremony}，${data.ceremonyCount||0} 人`,`午宴出席：${data.reception}，${data.guests||0} 人`,`素食：${data.vegetarian||0} 人`,`兒童座椅：${data.childSeats||0} 張`,`紙本喜帖：${data.invitation}`,`寄送地址：${data.address||'無'}`,`祝福：${data.message||''}`].join('\n');downloadFile(text,'text/plain;charset=utf-8','婚禮出席回覆.txt');document.getElementById('form-status').textContent='回覆檔案已下載，請自行轉交給新人。此頁面未傳送任何資料。';});
+
+// Apps Script 使用隱藏表單接收資料，只有收到儲存確認才顯示成功。
+function sendRSVP(data, timeoutMs = 45000) {
+ return new Promise((resolve,reject)=>{
+  const frame=document.createElement('iframe');
+  frame.name='rsvp-'+data.requestToken;frame.hidden=true;frame.title='出席回覆傳送';
+  const outgoing=document.createElement('form');
+  outgoing.method='POST';outgoing.action=CONFIG.rsvpEndpoint;outgoing.target=frame.name;outgoing.hidden=true;
+  const payload=document.createElement('input');payload.type='hidden';payload.name='payload';payload.value=JSON.stringify(data);outgoing.append(payload);
+  const cleanup=()=>{clearTimeout(timer);window.removeEventListener('message',receive);outgoing.remove();frame.remove();};
+  function receive(event){
+   if(!/^https:\/\/(?:script\.google\.com|(?:script|[a-z0-9-]+-script)\.googleusercontent\.com)$/.test(event.origin))return;
+   const result=event.data;
+   if(!result||result.type!=='wedding-rsvp'||result.requestToken!==data.requestToken||typeof result.ok!=='boolean')return;
+   cleanup();result.ok?resolve():reject(new Error(result.message||'回覆未儲存，請稍後再試。'));
+  }
+  const timer=setTimeout(()=>{cleanup();reject(new Error('尚未收到儲存確認，請稍後再按一次送出；相同回覆不會重複記錄。'));},timeoutMs);
+  window.addEventListener('message',receive);document.body.append(frame,outgoing);
+  try{outgoing.submit();}catch(error){cleanup();reject(error);}
+ });
+}
+let pendingReply=null;
+form.addEventListener('submit',async e=>{
+ e.preventDefault();
+ const status=document.getElementById('form-status');
+ if(location.origin!=='https://wsf10755005-ux.github.io'){status.textContent='請開啟線上請帖，再送出出席回覆。';return;}
+ if(form.dataset.sending)return;
+ const data=Object.fromEntries(new FormData(form));
+ if(Number(data.vegetarian||0)>Number(data.guests||0)){form.elements.vegetarian.setCustomValidity('素食人數不可超過午宴總人數');form.elements.vegetarian.reportValidity();return;}
+ // 強制以文字儲存電話，保留開頭的 0 與國碼。
+ data.phone="'"+String(data.phone||'').trim();
+ data.responseOrigin=location.origin;
+ const signature=JSON.stringify(data);
+ if(!pendingReply||pendingReply.signature!==signature)pendingReply={signature,token:crypto.randomUUID()};
+ data.requestToken=pendingReply.token;
+ const controls=Array.from(form.elements).map(input=>({input,disabled:input.disabled}));
+ const button=form.querySelector('[type="submit"]');
+ form.dataset.sending='true';controls.forEach(({input})=>input.disabled=true);button.textContent='正在送出…';status.textContent='正在儲存你的出席回覆，請稍候。';
+ try{await sendRSVP(data);status.textContent='已成功送出！謝謝你的回覆，期待與你相見。';form.reset();pendingReply=null;}
+ catch(error){status.textContent=error.message||'暫時無法送出，已保留填寫內容，請稍後再試。';}
+ finally{controls.forEach(({input,disabled})=>input.disabled=disabled);delete form.dataset.sending;button.textContent='送出出席回覆 ↗';syncFields();}
+});
 form.addEventListener('input',()=>form.elements.vegetarian.setCustomValidity(''));

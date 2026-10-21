@@ -34,9 +34,11 @@ GitHub Free 通常需使用公開儲存庫來使用 Pages；公開儲存庫內�
 
 在 GitHub 開啟 `assets` 資料夾，選 **Add file → Upload files**，上傳可使用的 MP3，命名為 `music.mp3`。再將 `script.js` 頂部的 `music: ''` 改為 `music: 'assets/music.mp3'`，提交後自動發布。賓客點右上角播放按鈕即可播放。
 
-## 出席回覆目前尚未串接
+## 出席回覆
 
-出席表單目前只會下載回覆文字檔，不會寫入 Google Sheets，也不會傳送給新人。Google Sheets 串接仍需完成 Google 帳號連線與 Apps Script 部署。不要把賓客回覆、電話、地址、Google 憑證或金鑰上傳到儲存庫。
+已串接 Google Apps Script，回覆寫入新人指定的「婚禮統計」試算表之「婚禮出席回覆」分頁。只有收到後端儲存確認才顯示成功；失敗時保留輸入，相同內容重試使用同一編號防止重複。電話以文字儲存，保留開頭的 0。
+
+請從線上 GitHub Pages 網站送出，直接開啟本機 HTML 僅供預覽。接收網址位於 script.js 的 rsvpEndpoint。不要將賓客回覆、電話、地址或 Google 憑證上傳到公開儲存庫。
 
 ## 網址
 
